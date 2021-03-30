@@ -11,39 +11,51 @@
  */
 
 const categories = [
-    {name: 'groceries', limit: 600},
-    {name: 'gas', limit: 200},
-    {name: 'restaurants', limit: 100},
-    {name: 'entertainment', limit: 100}
+    {name: 'Groceries', limit: 600},
+    {name: 'Gas', limit: 200},
+    {name: 'Restaurants', limit: 100},
+    {name: 'Entertainment', limit: 100}
 
 ];
 
 const budget = {
-    categories: categories,
-    expenses: [],
-    // ways to change the budget
-    addExpense() {
-        
-    },
+  categories: categories,
+  expenses: [],
+  // ways to change the budget
+  addExpense(category, amount) {
+    this.expenses.push({category, amount});
+  },
 	printBudgetOverview() {
+    const categoryLimits = this.categories.reduce((categoryLimits, category) => {
+      return categoryLimits += `${category.name}: ${category.limit}\n`
+    },'');
+
+    const totalBudgetAmount = this.categories.reduce((totalBudgetAmount, category) => {
+      return totalBudgetAmount += category.limit;
+    }, 0);
+
+    return categoryLimits + `\nTotal Budget Amount: ${totalBudgetAmount}`
 	},
 	printExpenseHistory() {
 	},
-    // questions we can ask about the budget
-    amIOverBudgetOverall() {
+  // questions we can ask about the budget
+  amIOverBudgetOverall() {
 
-    },
-    amIOverBudgetInCategory(category) {
+  },
+  amIOverBudgetInCategory(category) {
 
-    },
-    whenDidIGoOverBudget() {
+  },
+  whenDidIGoOverBudget() {
 
-    },
-    whatCategoryDoISpendTheMostOn() {
+  },
+  whatCategoryDoISpendTheMostOn() {
 
-    },
-    whatCategoriesCanISpendMoreOn() {
+  },
+  whatCategoriesCanISpendMoreOn() {
 
-    },
+  },
 	
-}
+};
+
+budget.addExpense('groceries', 50);
+console.log(budget.printBudgetOverview());
