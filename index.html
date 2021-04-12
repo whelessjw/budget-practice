@@ -1,11 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <script src="main.js"></script>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Budget Practice</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+      integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="style.css" />
   </head>
-  <body></body>
+  <body>
+    <header>
+      <div class="container">
+        <div class="row">
+          <div id="budget-title" class="col-lg-3">
+          </div>
+          <div class="col-lg-6">
+            <h2>Total Account Balance: <span id="total-balance" class="text-success">$0</span></h2>
+          </div>
+          <div class="col-lg-3">
+            <button type="button" id="next-months-budget" class="btn btn-outline-primary">Create Next Month's Budget</button>
+          </div>
+      </div>
+
+    </header>
+
+    <div class="container first-title">
+      <h1>Budget The Money In Your Bank Account</h1>
+    </div>
+    <div class="container first-form">
+        <form>
+          <div class="form-row ">
+            <div class="col-12">
+              <input
+                id="initial-account-balance"
+                type="number"
+                class="form-control"
+                placeholder="Enter Your Bank Account Balance"
+              />
+            </div>
+          </div>
+        </form>
+        <button type="button" id="create-budget" class="btn btn-primary btn-lg">Create Your Budget</button>
+    </div>
+    <div class="container main-content">
+      <div class="row">
+        <div class="col-lg-4">
+          <table class="table table-success table-striped table-borderless">
+            <thead>
+              <tr>
+                <th colspan="2">Available To Budget:</th>
+                <th colspan="1" id="income-to-budget" class="text-success">$0</th>
+              </tr>
+            </thead>
+          </table>
+          <table class="table table-primary table-striped  table-borderless table-sm">
+            <thead>
+                <th><u>Category</u></th>
+                <th><u>Budgeted</u></th>
+                <th><u>Spent</u></th>
+                <th><u>Balance</u></th>
+            </thead>
+            <tbody id="category-table">
+            </tbody>
+          </table>
+          <form>
+            <div class="form-row">
+              <div class="col-6">
+                <input
+                  id="category-name-form"
+                  type="text"
+                  class="form-control"
+                  placeholder="Category"
+                />
+              </div>
+              <div class="col-6">
+                <input
+                  id="budget-amount-form"
+                  type="number"
+                  class="form-control"
+                  placeholder="Amount"
+                />
+              </div>
+            </div>
+          </form>
+          <button id="add-to-category" type="button" class="btn btn-primary">Add To Category</button>
+        </div>
+        <div class="col-lg-4">
+          <table class="table table-success table-striped table-borderless table-sm">
+            <thead>
+              <tr>
+                <th colspan="2">Total Income This Month:</th>
+                <th colspan="1" id="total-income" class="text-success">$0</th>
+              </tr>
+              <tr>
+                <th colspan="1"><u>Income Source</u></th>
+                <th colspan="1"><u>Amount</u></th>
+                <th colspan="1"><u>Date</u></th>
+              </tr>
+            </thead>
+            <tbody id="income-sources">
+            </tbody>
+          </table>
+          <hr />
+          <form>
+            <div class="form-row">
+              <div class="col-12">
+                <input
+                  id="income-source"
+                  type="text"
+                  class="form-control"
+                  placeholder="Income Source"
+                />
+              </div>
+              <div class="col-12">
+                <input
+                  id="income-amount"
+                  type="number"
+                  class="form-control"
+                  placeholder="Amount"
+                />
+              </div>
+              <div class="col-12">
+                <input id="income-date" type="date" class="form-control" placeholder="Date" />
+              </div>
+            </div>
+          </form>
+          <button type="button" id="add-income" class="btn btn-success">Add Income</button>
+        </div>
+        <div class="col-lg-4">
+          <table class="table table-danger table-striped table-borderless table-sm">
+            <thead>
+              <tr>
+                <th colspan="2">Expenses This Month:</th>
+                <th colspan="1" id="expenses-this-month" class="text-danger">$0</th>
+              </tr>
+              <tr>
+                <th><u>Category</u></th>
+                <th><u>Expense</u></th>
+                <th><u>Date</u></th>
+              </tr>
+            </thead>
+            <tbody id="expenses-table">
+            </tbody>
+          </table>
+          <hr />
+          <form>
+            <div class="form-row">
+              <div class="col-12">
+                <input
+                  id="expense-category"
+                  type="text"
+                  class="form-control"
+                  placeholder="Category"
+                />
+              </div>
+              <div class="col-12">
+                <input
+                  id="expense-amount"
+                  type="number"
+                  class="form-control"
+                  placeholder="Amount"
+                />
+              </div>
+              <div class="col-12">
+                <input
+                  id="expense-date"
+                  type="date"
+                  class="form-control"
+                  placeholder="Date"
+                />
+              </div>
+            </div>
+          </form>
+          <button type="button" id="add-expense-button" class="btn btn-danger">Add Expense</button>
+        </div>
+      </div>
+    </div>  
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+      crossorigin="anonymous"
+    ></script>
+    <script src="main.js"></script>
+    <script src="scripts.js"></script>
+  </body>
 </html>

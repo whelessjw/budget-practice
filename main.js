@@ -1,61 +1,141 @@
-/*
- * Use the Array functions to answer some questions about a budget representation
- * - do something for each item in a list with Array.forEach
- * - transform each item in a list with Array.map
- * - combine each item in a list with Array.reduce
- * - check if every item in a list matches a condition with Array.every
- * - check if some item in a list matches a condition with Array.some
- * - find the first matching item with Array.find and the position in the list with Array.findIndex
- * - get only matching items with Array.filter
- * - change the order of the items in a list with Array.sort
- */
-
 const categories = [
-    {name: 'Groceries', limit: 600},
-    {name: 'Gas', limit: 200},
-    {name: 'Restaurants', limit: 100},
-    {name: 'Entertainment', limit: 100}
-
+  {name: 'savings', balance: 0},
+  {name: 'housing', balance: 0},
+  {name: 'utilities', balance: 0},
+  {name: 'groceries', balance: 0},
+  {name: 'restaurants', balance: 0},
+  {name: 'car payment', balance: 0},
+  {name: 'gas', balance: 0},
+  {name: 'personal', balance: 0}
+  
 ];
+
+let months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
+let totalAccountBalance = 0;
+let availableToBudget = 0;
+let totalIncomeForMonth = 0;
+
+const date = new Date();
+let month = date.getMonth();
+let year = date.getFullYear();
+let currentMonth = months[month];
 
 const budget = {
   categories: categories,
-  expenses: [],
-
+  incomeThisMonth: [],
+  expensesThisMonth: {},
+  budgetAllocations: {},
+  startBudgetForNewMonth() {
+    if (month === 11) {
+      month = 0;
+      year += 1;
+    } else {
+      month += 1;
+    };
+    currentMonth = months[month];
+    totalIncomeForMonth = 0;
+    this.incomeThisMonth = [];
+    this.expensesThisMonth = [];
+    this.budgetAllocations = [];
+    },
   totalBudgetAmount() {return this.categories.reduce((totalBudgetAmount, category) => {
-    return totalBudgetAmount += category.limit;
+    return totalBudgetAmount += category.balance;
   }, 0)},
 
   totalExpensesAmount(){
-    return this.expenses.reduce((totalExpenses, expense) => {
-      return totalExpenses += expense.amount;
-    },0)},
+    let totalExpenses = 0;
+
+    for (let key in this.expensesThisMonth) {
+      totalExpenses += this.expensesThisMonth[key];
+    }
+
+    return totalExpenses;
+  },
 
   // ways to change the budget
+  increaseCategoryBalance(name, amount) {
+    const categoryToIncrease = categories.find(category => {
+      return category.name === name;
+    })
+    categoryToIncrease.balance += parseInt(amount);
+  },
+  decreaseCategoryBalance(name, amount) {
+    const categoryToDecrease = categories.find(category => {
+      return category.name === name;
+    })
+    categoryToDecrease.balance += parseInt(amount);
+  },
+  decreaseBudgetAllocation(name, amount) {
+    this.budgetAllocations[name] += amount;
+  },
+  increaseBudgetAllocation(name, amount) {
+    this.budgetAllocations[name] += amount;
+  },
+  totalBalanceInCategories() {return this.categories.reduce((totalBalance, category) => {
+    return totalBalance += category.balance;
+  }, 0)},
+
+  totalAccountBalance() {
+    const categoriesTotal = this.totalBalanceInCategories();
+    return categoriesTotal + availableToBudget;
+  },
+
+  addCategory(categoryName, balance) {
+    balance = parseInt(balance);
+    this.categories.push({name: categoryName, balance: balance});
+    this.expensesThisMonth[categoryName] = 0;
+  },
+
+  addIncome(dollarAmount) {
+    incomeThisMonth.push(dollarAmount);
+    availableToBudget += dollarAmount;
+  },
+
   addExpense(categoryName, amount) {
+    categoryName = categoryName.toLowerCase();
+
     if (this.categories.some(category => {
-      return category.name.toLowerCase() === categoryName.toLowerCase();
+      return category.name === categoryName;
     } )) {
-      this.expenses.push({categoryName, amount});
+      this.expensesThisMonth.push({categoryName, amount});
     } else {
-      console.log(`Category doesn't exist`) 
+      console.warn(`Category didn't exist, adding it automatically.`);
+      this.addCategory(categoryName, 0);
+      this.addExpense(categoryName, amount);
+      console.log(categories);
     }
   },
 
 	printBudgetOverview() {
-    const categoryLimits = this.categories.reduce((categoryLimits, category) => {
-      return categoryLimits += `${category.name}: ${category.limit}\n`
-    },'');
+    const rows = categories.map(category => `${category.name}: ${category.balance}`);
+
+    const overview = rows.reduce((overview, row) => {
+      return overview + row + '\n'
+    }, '')
 
     const totalBudgetAmount = this.categories.reduce((totalBudgetAmount, category) => {
-      return totalBudgetAmount += category.limit;
+      return totalBudgetAmount += category.balance;
     }, 0);
 
-    return categoryLimits + `\nTotal Budget Amount: ${totalBudgetAmount}`
+    return overview + `\nTotal Budget Amount: ${totalBudgetAmount}`
 	},
 
 	printExpenseHistory() {
-    const listedExpenses = this.expenses.reduce((listedExpenses, expense) => {
+    const listedExpenses = this.expensesThisMonth.reduce((listedExpenses, expense) => {
       return listedExpenses += `${expense.categoryName}: ${expense.amount}\n`
     },`Expense History:\n`)
 
@@ -68,19 +148,27 @@ const budget = {
     (this.totalBudgetAmount() - this.totalExpensesAmount()) < 0;
 
     if (overBudget) {
-      return `YOU ARE OVER BUDGET!`
+      return true;
     }
 
-    return `You are not over budget.`
+    return false;
+  },
+
+  printBudgetRunoverStatement() {
+    if (this.amIOverBudgetOverall()) {
+      console.log('YOU ARE OVER BUDGET!')
+    } else {
+      console.log(`You are not over budget. ${this.whatCategoriesCanISpendMoreOn()}`);
+    }
   },
 
   amIOverBudgetInCategory(category) {
     const categoryObject = this.categories.find(categoryObj => {
-            return categoryObj.name.toLowerCase() === category.toLowerCase();
+            return categoryObj.name === category.toLowerCase();
     });
-    const categoryBudget = categoryObject.limit;
-    const categoryExpenses = this.expenses.filter(categoryObj => {
-     return categoryObj.categoryName.toLowerCase() === category.toLowerCase();
+    const categoryBudget = categoryObject.balance;
+    const categoryExpenses = this.expensesThisMonth.filter(categoryObj => {
+     return categoryObj.categoryName === category.toLowerCase();
     });
 
     const totalExpenses = categoryExpenses.reduce((totalExpenses, expense) => {
@@ -90,39 +178,51 @@ const budget = {
     const overBudget = (categoryBudget - totalExpenses) < 0;
 
     if (overBudget) {
-      return `YOU ARE OVER BUDGET IN THE ${category} CATEGORY!`
+      return true;
     }
 
-    return `You are not over budget in the ${category} category`
+    return false;
+  },
+
+  findFirstExpenseOverBudget() {
+    let expenditure = 0;
+    const totalBudgetAmount = this.totalBudgetAmount();
+
+    return this.expensesThisMonth.find(expense => {
+      expenditure += expense.amount;
+      if (expenditure > totalBudgetAmount) {
+        return true;
+      } else {
+        return false;
+      }
+    })
   },
 
   whenDidIGoOverBudget() {
-    return this.expenses.reduce((accumulator, expense) => {
-      if ((typeof accumulator) !== 'number') {
-        return accumulator;
-      }
+    const firstExpenseOverBudget = this.findFirstExpenseOverBudget();
+    if (firstExpenseOverBudget === undefined) {
+      console.log('You are not over budget.')
+    } else {
+      console.log(`You went over when you spent ${firstExpenseOverBudget.amount} on ${firstExpenseOverBudget.categoryName}`)
+    }
+  },
 
-      accumulator -= expense.amount;
+  getSpendingByCategory() {
+    const spendingByCategory = {};
 
-      if (accumulator < 0) {
-        return `You went over when you spent ${expense.amount} on ${expense.categoryName}`
+    this.expensesThisMonth.forEach(expense => {
+      if (!spendingByCategory[expense.categoryName]) {
+        spendingByCategory[expense.categoryName] = expense.amount;
       } else {
-        return accumulator;
+        spendingByCategory[expense.categoryName] += expense.amount;
       }
+    });
 
-    }, this.totalBudgetAmount())
+    return spendingByCategory;
   },
 
   whatCategoryDoISpendTheMostOn() {
-    const categoryExpenses = {};
-
-    this.expenses.forEach(expense => {
-      if (!categoryExpenses[expense.categoryName]) {
-        categoryExpenses[expense.categoryName] = expense.amount;
-      } else {
-        categoryExpenses[expense.categoryName] += expense.amount;
-      }
-    });
+    const categoryExpenses = this.getSpendingByCategory();
 
     let mostExpensiveAmount = 0;
     let mostExpensiveCategory;
@@ -138,18 +238,10 @@ const budget = {
   },
 
   whatCategoriesCanISpendMoreOn() {
-    const categoryExpenses = {};
-
-    this.expenses.forEach(expense => {
-      if (!categoryExpenses[expense.categoryName.toLowerCase()]) {
-        categoryExpenses[expense.categoryName.toLowerCase()] = expense.amount;
-      } else {
-        categoryExpenses[expense.categoryName.toLowerCase()] += expense.amount;
-      }
-    });
+    const categoryExpenses = this.getSpendingByCategory();
 
     const canSpendMore = categories.filter(category => {
-      return category.limit > categoryExpenses[category.name.toLowerCase()];
+      return category.balance > categoryExpenses[category.name];
     });
 
     return canSpendMore.reduce((message, category) => {
@@ -159,18 +251,19 @@ const budget = {
 	
 };
 
-budget.addExpense('groceries', 550);
-budget.addExpense('groceries', 50);
-budget.addExpense('gas', 50);
-budget.addExpense('Restaurants', 250);
-budget.addExpense('Entertainment', 200);
-budget.addExpense('doesntexist', 25);
-console.log(budget.printBudgetOverview());
-console.log(budget.printExpenseHistory());
-console.log(budget.totalBudgetAmount());
-console.log(budget.totalExpensesAmount());
-console.log(budget.amIOverBudgetOverall());
-console.log(budget.amIOverBudgetInCategory('groceries'));
-console.log(budget.whenDidIGoOverBudget());
-console.log(budget.whatCategoryDoISpendTheMostOn());
-console.log(budget.whatCategoriesCanISpendMoreOn());
+// budget.addExpense('groceries',550);
+// budget.addExpense('groceries', 50);
+// budget.addExpense('gas', 50);
+// budget.addExpense('Restaurants', 250);
+// budget.addExpense('Entertainment', 200);
+// console.log(budget.printBudgetOverview());
+// console.log(budget.printExpenseHistory());
+// console.log(budget.totalBudgetAmount());
+// console.log(budget.totalExpensesAmount());
+// console.log(budget.amIOverBudgetOverall());
+// budget.printBudgetRunoverStatement();
+// console.log(budget.amIOverBudgetInCategory('groceries'));
+// budget.whenDidIGoOverBudget();
+// console.log(budget.whatCategoryDoISpendTheMostOn());
+// console.log(budget.whatCategoriesCanISpendMoreOn());
+// budget.addExpense('tithe', 100);
